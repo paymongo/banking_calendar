@@ -7,7 +7,7 @@ module BankingCalendar
     class << self
       attr_accessor :additional_load_paths
 
-      def load_calendar(calendar)
+      def load(calendar)
         file_name = "#{calendar}.yml"
 
         directory = calendars.find do |d|
@@ -22,6 +22,16 @@ module BankingCalendar
         new(yaml)
       end
 
+      def load_calendar(calendar)
+        @semaphore.synchronize do
+          @cached_calendars ||= {}
+          unless @cached_calendars.include?(calendar)
+            @cached_calendars[calendar] = load(calendar)
+          end
+          @cached_calendars[calendar]
+        end
+      end
+
       private
 
       def calendars
@@ -33,6 +43,8 @@ module BankingCalendar
     DEFAULT_BANKING_DAYS = %w[mon tue wed thu fri].freeze
     VALID_CALENDAR_KEYS = %i[banking_days bank_holidays].freeze
     VALID_DAYS = %w[sun mon tue wed thu fri sat].freeze
+
+    @semaphore = Mutex.new
 
     def initialize(config)
       @config = config
