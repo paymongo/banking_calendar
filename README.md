@@ -13,7 +13,7 @@ You may use the package by running:
 gem install banking_calendar
 ```
 
-If you are installing via the bundler, amke sure to use the https rubygems source:
+If you are installing via the bundler, make sure to use the https rubygems source:
 
 ```sh
 source 'https://rubygems.org'
