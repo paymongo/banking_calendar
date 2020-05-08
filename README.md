@@ -1,5 +1,6 @@
 # Banking Calendar
 
+[![Gem Version](https://badge.fury.io/rb/banking_calendar.svg)](https://badge.fury.io/rb/banking_calendar)
 [![CircleCI](https://circleci.com/gh/paymongo/banking_calendar.svg?style=svg)](https://circleci.com/gh/paymongo/banking_calendar)
 
 This Banking Calendar library provides a way to calculate days based on the banking calendar.
@@ -38,7 +39,7 @@ Some few calendar configurations are provided. You may use them by calling `load
 the name of the calendar you want to load. You may refer to the list of available calendars below.
 
 ```ruby
-  calendar = BankingCalendar::Calendar.load_calendar('bsp')
+calendar = BankingCalendar::Calendar.load_calendar('bsp')
 ```
 
 ## Useful methods
