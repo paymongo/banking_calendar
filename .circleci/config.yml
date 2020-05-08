@@ -1,0 +1,50 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: circleci/ruby:<< parameters.ruby-version >>
+    parameters:
+      ruby-version:
+        type: string
+    steps:
+      - checkout
+      - run:
+          name: Update bundler
+          command: |
+            gem update --system
+            gem install bundler
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - bundle-v1-<< parameters.ruby-version >>-{{ checksum "banking_calendar.gemspec" }}
+            - bundle-v1-<< parameters.ruby-version >>-
+      - run:
+          name: Bundle install
+          command: bundle install --clean --no-cache --path vendor/bundle --jobs=4 --retry=3
+      - save_cache:
+          key: bundle-v1-<< parameters.ruby-version >>-{{ checksum "banking_calendar.gemspec" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Run rspec
+          command: |
+            mkdir -p test_resuts/rspec test_artifacts
+            TESTFILES=$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+            bundle exec rspec --profile 10 \
+                              --color \
+                              --order random \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml \
+                              --format progress \
+                              -- ${TESTFILES}
+
+workflows:
+  default:
+    jobs:
+      - test:
+          name: Ruby << matrix.ruby-version >>
+          matrix:
+            parameters:
+              ruby-version: ["2.5.8", "2.6.6", "2.7.1"]
