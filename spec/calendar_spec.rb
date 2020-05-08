@@ -18,14 +18,6 @@ describe BankingCalendar::Calendar do
     context 'when calendar is valid' do
       subject { BankingCalendar::Calendar.load_calendar('bsp') }
 
-      it 'loads the yaml file' do
-        expect(YAML).to receive(:load_file) do |path|
-          expect(path).to match(/bsp\.yml$/)
-        end.and_return({})
-
-        subject
-      end
-
       it { is_expected.to be_a BankingCalendar::Calendar }
     end
 
