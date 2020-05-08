@@ -28,6 +28,8 @@ the name of the calendar you want to load. You may refer to the list of availabl
   calendar = BankingCalendar::Calendar.load_calendar('bsp')
 ```
 
+*TODO: Add other usage to the calendar*
+
 ## Calculating banking days
 
 ### banking_days_after(date, interval)
@@ -46,6 +48,10 @@ date = Date.parse('2020-05-04')
 calendar.banking_days_after(date, 2).strftime("%A, %B %d, %Y")
 # => Wednesday, May 06, 2020
 ```
+
+### banking_days_before(date, interval)
+
+*TODO: Add other usage for calculations*
 
 
 ## Available pre-configured calendars
