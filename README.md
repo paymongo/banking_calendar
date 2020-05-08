@@ -6,6 +6,12 @@ This Banking Calendar library provides a way to calculate days based on the bank
 
 # How to use
 
+You may use the package by running:
+
+```sh
+gem install banking_calendar
+```
+
 ## Basic usage
 
 You can create a banking calendar by creating an instance of the `Calendar` class and specifying
