@@ -44,14 +44,6 @@ describe BankingCalendar::Calendar do
       after { BankingCalendar::Calendar.additional_load_paths = nil }
       subject { BankingCalendar::Calendar.load_calendar('valid_calendar') }
 
-      it 'loads the yaml file' do
-        expect(YAML).to receive(:load_file) do |path|
-          expect(path).to match(/valid_calendar\.yml$/)
-        end.and_return({})
-
-        subject
-      end
-
       it { is_expected.to be_a BankingCalendar::Calendar }
 
       context 'when also a default calendar' do
