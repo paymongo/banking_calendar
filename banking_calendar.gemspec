@@ -15,11 +15,10 @@ Gem::Specification.new do |s|
   s.homepage              = 'https://github.com/paymongo/banking_calendar'
   s.license               = 'MIT'
 
-  s.files                 = `git ls-files`.split('\n')
-  s.test_files            = `git ls-files -- test/*`.split('\n')
-  s.executables           = `git ls-files -- bin/*`.split('\n')
-                                                   .map { |f| ::File.basename(f) }
-  s.require_paths = ['lib']
+  s.files                 = `git ls-files`.split($/)
+  s.test_files            = s.files.grep(%r{^(test|spec|features)/})
+  s.executables           = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.require_paths         = ['lib']
 
   s.add_development_dependency 'rspec', '~> 3.1'
   s.add_development_dependency 'rspec_junit_formatter', '~> 0.4.1'
