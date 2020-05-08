@@ -28,13 +28,21 @@ the name of the calendar you want to load. You may refer to the list of availabl
   calendar = BankingCalendar::Calendar.load_calendar('bsp')
 ```
 
-*TODO: Add other usage to the calendar*
+## Useful methods
 
-## Calculating banking days
+### banking_day?(date)
+Determine if a provided `date` is a banking day in the calendar.
+
+```ruby
+calendar.banking_day?(Date.parse('2020-05-01'))
+# => false
+calendar.banking_day?(Date.parse('15 April 2020'))
+# => true
+```
 
 ### banking_days_after(date, interval)
-Given a date, this method returns the date after `interval` number of business days. If the given
-date falls on a non-banking day, the calculation starts at the next possible banking day.
+Given a `date`, this method returns the date after `interval` number of business days. If the given
+`date` falls on a non-banking day, the calculation starts at the next possible banking day.
 
 ```ruby
  # May 4, Monday is a banking day
@@ -43,16 +51,71 @@ calendar.banking_days_after(date, 4).strftime("%A, %B %d, %Y")
 # => Friday, May 08, 2020
 
 # May 1, Friday is a bank holiday
-date = Date.parse('2020-05-04')
+date = Date.parse('2020-05-01')
 # Next banking day is May 4, Monday
 calendar.banking_days_after(date, 2).strftime("%A, %B %d, %Y")
 # => Wednesday, May 06, 2020
 ```
 
 ### banking_days_before(date, interval)
+Given a `date`, this method returns the prior `interval` number of business days. If the given
+`date` falls on a non-banking day, the calculation starts at the first previous possible banking day.
 
-*TODO: Add other usage for calculations*
+```ruby
+ # May 22, 2020 Friday is a banking day
+date = Date.parse('2020-05-22')
+calendar.banking_days_before(date, 4).strftime("%A, %B %d, %Y")
+# => Monday, May 18, 2020
 
+# May 1, 2020 Friday is a bank holiday
+date = Date.parse('2020-05-01')
+# Previous banking day is April 30, 2020 Thursday
+calendar.banking_days_after(date, 2).strftime("%A, %B %d, %Y")
+# => Tuesday, April 28, 2020
+```
+
+### next_banking_day(date)
+This method returns the next possible banking day after a given `date`.
+
+```ruby
+# April 15, 2020 Wednesday is a banking day
+date = Date.parse('2020-04-15')
+calendar.next_banking_day(date).strftime("%A, %B %d, %Y")
+# => Thursday, April 16, 2020
+
+# May 15, 2020 Friday is a banking day
+date = Date.parse('2020-05-15')
+# The following day May 16, 2020 is a Saturday
+calendar.next_banking_day(date).strftime("%A, %B %d, %Y")
+# => Monday, May 18, 2020
+
+# June 06, 2020 Friday is a banking day
+date = Date.parse('2020-06-06')
+# The following day June 07, 2020 is a Sunday
+calendar.next_banking_day(date).strftime("%A, %B %d, %Y")
+# => Monday, June 08, 2020
+```
+
+### previous_banking_day(date)
+This method returns the previous possible banking day before a given `date`.
+
+```ruby
+# April 15, 2020 Wednesday is a banking day
+date = Date.parse('2020-04-15')
+calendar.previous_banking_day(date).strftime("%A, %B %d, %Y")
+# => Tuesday, April 14, 2020
+
+# May 16, 2020 Saturday is non-banking day
+date = Date.parse('2020-05-16')
+calendar.previous_banking_day(date).strftime("%A, %B %d, %Y")
+# => Friday, May 15, 2020
+
+# June 08, 2020 Monday is a banking day
+date = Date.parse('2020-06-08')
+# The previous day June 07, 2020 is a Sunday
+calendar.previous_banking_day(date).strftime("%A, %B %d, %Y")
+# => Friday, June 06, 2020
+```
 
 ## Available pre-configured calendars
 
