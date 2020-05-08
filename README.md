@@ -12,6 +12,13 @@ You may use the package by running:
 gem install banking_calendar
 ```
 
+If you are installing via the bundler, amke sure to use the https rubygems source:
+
+```sh
+source 'https://rubygems.org'
+
+gem 'banking_calendar'
+```
 ## Basic usage
 
 You can create a banking calendar by creating an instance of the `Calendar` class and specifying
