@@ -41,7 +41,13 @@ module BankingCalendar
     end
 
     DEFAULT_BANKING_DAYS = %w[mon tue wed thu fri].freeze
-    VALID_CALENDAR_KEYS = %i[banking_days bank_holidays].freeze
+    DEFAULT_BANKING_HOURS = (9..16).to_a.freeze
+    VALID_CALENDAR_KEYS = %i[
+      banking_days
+      bank_holidays
+      banking_hours
+    ].freeze
+    VALID_BANKING_HOURS_KEYS = %i[start end].freeze
     VALID_DAYS = %w[sun mon tue wed thu fri sat].freeze
 
     @semaphore = Mutex.new
@@ -75,8 +81,18 @@ module BankingCalendar
       date
     end
 
+    # Given a date, add interval number of banking days.
+    #
+    # If the given date is not a banking day, counting starts from the
+    # next banking day.
+    #
+    # If banking hours are provided, returned date and time will be
+    # normalized to the end of banking day. If given date does not fall
+    # during a banking hour, counting starts from the next banking day.
     def banking_days_after(date, interval)
+      date = normalize_date(date, :after) if with_banking_hours?
       date = next_banking_day(date) unless banking_day?(date)
+
       interval.times do
         date = next_banking_day(date)
       end
@@ -84,8 +100,18 @@ module BankingCalendar
       date
     end
 
+    # Given a date, subtract interval number of banking days.
+    #
+    # If the given date is not a banking day, counting starts from the
+    # previous banking day.
+    #
+    # If banking hours are provided, returned date and time will be
+    # normalized to the end of banking day. If given date does not fall
+    # during a banking hour, counting starts from the prior banking day.
     def banking_days_before(date, interval)
+      date = normalize_date(date, :before) if with_banking_hours?
       date = previous_banking_day(date) unless banking_day?(date)
+
       interval.times do
         date = previous_banking_day(date)
       end
@@ -103,6 +129,41 @@ module BankingCalendar
       true
     end
 
+    def banking_hour?(date)
+      time_or_datetime?(date)
+
+      hour = date.hour
+
+      return false unless banking_day?(date)
+      return false unless banking_hours.include?(hour)
+
+      true
+    end
+
+    def before_banking_hours?(date)
+      time_or_datetime? date
+      return false unless banking_day?(date)
+
+      date.hour < banking_hours.min
+    end
+
+    def after_banking_hours?(date)
+      time_or_datetime? date
+      return true unless banking_day?(date)
+
+      date.hour > banking_hours.max
+    end
+
+    def end_of_banking_day(date)
+      date.class.new(
+        date.year,
+        date.month,
+        date.day,
+        banking_hours.max + 1,
+        0
+      )
+    end
+
     private
 
     def duration_for(date, interval = 1)
@@ -113,6 +174,54 @@ module BankingCalendar
       (dates || []).map do |date|
         date.is_a?(Date) ? date : Date.parse(date)
       end
+    end
+
+    def time_or_datetime?(date)
+      unless date.is_a?(Time) || date.is_a?(DateTime)
+        raise "#{date} is #{date.class}. " \
+          'Must be Time or DateTime if accounting for banking hours.'
+      end
+    end
+
+    def roll_forward(date)
+      if banking_day?(date) && after_banking_hours?(date)
+        date = next_banking_day(date)
+      end
+
+      date
+    end
+
+    def roll_backward(date)
+      if banking_day?(date) && before_banking_hours?(date)
+        date = previous_banking_day(date)
+      end
+
+      date
+    end
+
+    def normalize_date(date, rollover)
+      time_or_datetime? date
+
+      if rollover == :after
+        date = roll_forward(date)
+      elsif rollover == :before
+        date = roll_backward(date)
+      end
+      date = end_of_banking_day(date)
+
+      date
+    end
+
+    def banking_hours
+      @banking_hours ||= (@config[:banking_hours] || DEFAULT_BANKING_HOURS).map do |hour|
+        hour.tap do |h|
+          raise "#{h} is an invalid hour." if h > 24 || h.negative?
+        end
+      end
+    end
+
+    def with_banking_hours?
+      @config.key?(:banking_hours)
     end
 
     def banking_days
