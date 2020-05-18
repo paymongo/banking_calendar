@@ -2,7 +2,7 @@
 
 - Initial release
 
-# v0.1.0 - May 19, 2020
+# v0.1.0 - May 18, 2020
 
 - Adds support for banking time and normalization of banking days
 - Includes banking time in rollover calculations, if provided
