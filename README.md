@@ -57,6 +57,16 @@ calendar.banking_day?(Date.parse('15 April 2020'))
 # => true
 ```
 
+### banking_hour?(date)
+Given a `date`, determine if the time component falls within the configured banking hours.
+
+```ruby
+calendar.banking_hour?(DateTime.parse('2020-05-04 11:00'))
+# => true
+calendar.banking_hour?(DateTime.parse('2020-05-04 19:00'))
+# => false
+```
+
 ### banking_days_after(date, interval)
 Given a `date`, this method returns the date after `interval` number of business days. If the given
 `date` falls on a non-banking day, the calculation starts at the next possible banking day.
