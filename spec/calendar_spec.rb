@@ -39,21 +39,6 @@ describe BankingCalendar::Calendar do
         )
       end
     end
-
-    context 'when calendar is from an additional directory' do
-      after { BankingCalendar::Calendar.additional_load_paths = nil }
-      subject { BankingCalendar::Calendar.load_calendar('valid_calendar') }
-
-      it { is_expected.to be_a BankingCalendar::Calendar }
-
-      context 'when also a default calendar' do
-        subject { BankingCalendar::Calendar.load_calendar('bsp') }
-
-        it 'uses the custom calendar' do
-          expect(subject.banking_day?(Date.parse('2020-11-03'))).to eq(false)
-        end
-      end
-    end
   end
 
   shared_examples 'shared' do
@@ -570,6 +555,10 @@ describe BankingCalendar::Calendar do
             it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 2) * interval)) }
           end
         end
+      end
+
+      context 'when it is a non-banking day' do
+
       end
     end
   end
