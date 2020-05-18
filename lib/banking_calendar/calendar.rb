@@ -87,8 +87,8 @@ module BankingCalendar
     # next banking day.
     #
     # If banking hours are provided, returned date and time will be
-    # normalized to the end of banking day. If given date does not fall
-    # during a banking hour, counting starts from the next banking day.
+    # normalized to the end of banking day. If given date falls after
+    # banking hours, counting starts from the next banking day.
     def banking_days_after(date, interval)
       date = normalize_date(date, :after) if with_banking_hours?
       date = next_banking_day(date) unless banking_day?(date)
@@ -106,8 +106,8 @@ module BankingCalendar
     # previous banking day.
     #
     # If banking hours are provided, returned date and time will be
-    # normalized to the end of banking day. If given date does not fall
-    # during a banking hour, counting starts from the prior banking day.
+    # normalized to the end of banking day. If given date falls before
+    # banking hours, counting starts from the prior banking day.
     def banking_days_before(date, interval)
       date = normalize_date(date, :before) if with_banking_hours?
       date = previous_banking_day(date) unless banking_day?(date)
