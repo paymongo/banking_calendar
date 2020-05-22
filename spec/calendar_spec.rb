@@ -558,7 +558,65 @@ describe BankingCalendar::Calendar do
       end
 
       context 'when it is a non-banking day' do
+        context 'preceded only by banking days' do
+          context 'when time is before banking hours' do
+            let(:date) { date_class.parse('2020-05-16 08:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 1) * interval)) }
+          end
 
+          context 'when time is during banking hours' do
+            let(:date) { date_class.parse('2020-05-16 09:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 1) * interval)) }
+          end
+
+          context 'when time is after banking hours' do
+            let(:date) { date_class.parse('2020-05-16 18:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 1) * interval)) }
+          end
+        end
+
+        context 'preceded by a weekend' do
+          context 'when time is before banking hours' do
+            let(:date) { date_class.parse('2020-05-17 08:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 2) * interval)) }
+          end
+
+          context 'when time is during banking hours' do
+            let(:date) { date_class.parse('2020-05-17 09:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 2) * interval)) }
+          end
+
+          context 'when time is after banking hours' do
+            let(:date) { date_class.parse('2020-05-17 18:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 2) * interval)) }
+          end
+        end
+
+        context 'preceded by banking days and non-banking days' do
+          context 'when time is before banking hours' do
+            let(:date) { date_class.parse('2020-04-11 08:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 3) * interval)) }
+          end
+
+          context 'when time is during banking hours' do
+            let(:date) { date_class.parse('2020-04-11 09:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 3) * interval)) }
+          end
+
+          context 'when time is after banking hours' do
+            let(:date) { date_class.parse('2020-04-11 18:00') }
+            let(:delta) { 2 }
+            it { is_expected.to eq(cal.end_of_banking_day(date - (delta + 3) * interval)) }
+          end
+        end
       end
     end
   end
