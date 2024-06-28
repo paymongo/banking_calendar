@@ -15,14 +15,14 @@ module BankingCalendar
         end
         raise "Cannot find calendar #{calendar}" unless directory
 
-        yaml = if RUBY_VERSION >= "3.3.0"
+        yaml = begin
+          YAML.load_file(
+            File.join(directory, file_name)
+          ).transform_keys(&:to_sym)
+        rescue Psych::DisallowedClass
           YAML.load_file(
             File.join(directory, file_name),
             permitted_classes: [Date]
-          ).transform_keys(&:to_sym)
-        else
-          YAML.load_file(
-            File.join(directory, file_name)
           ).transform_keys(&:to_sym)
         end
 
