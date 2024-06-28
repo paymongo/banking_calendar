@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: circleci/ruby:<< parameters.ruby-version >>
+      - image: cimg/ruby:<< parameters.ruby-version >>
     parameters:
       ruby-version:
         type: string
@@ -11,8 +11,8 @@ jobs:
       - run:
           name: Update bundler
           command: |
-            gem update --system
-            gem install bundler
+            sudo gem update --system
+            sudo gem install bundler -v 1.17.3
       - run:
           name: Which bundler?
           command: bundle -v
@@ -47,4 +47,4 @@ workflows:
           name: Ruby << matrix.ruby-version >>
           matrix:
             parameters:
-              ruby-version: ["2.5.8", "2.6.6", "2.7.1"]
+              ruby-version: ["2.5.8", "2.6.6", "2.7.1", "3.0.6", "3.3.0"]

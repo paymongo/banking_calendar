@@ -1,9 +1,11 @@
-.DS_Store
 .bundle
+.DS_Store
 *.gem
-Gemfile.lock
+/.history
+/vendor
 coverage/
 doc/
+Gemfile.lock
 spec/coverage
 spec/reports
 tmp

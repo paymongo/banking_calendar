@@ -15,9 +15,16 @@ module BankingCalendar
         end
         raise "Cannot find calendar #{calendar}" unless directory
 
-        yaml = YAML.load_file(
-          File.join(directory, file_name)
-        ).transform_keys(&:to_sym)
+        yaml = if RUBY_VERSION >= "3.3.0"
+          YAML.load_file(
+            File.join(directory, file_name),
+            permitted_classes: [Date]
+          ).transform_keys(&:to_sym)
+        else
+          YAML.load_file(
+            File.join(directory, file_name)
+          ).transform_keys(&:to_sym)
+        end
 
         new(yaml)
       end
@@ -25,9 +32,7 @@ module BankingCalendar
       def load_calendar(calendar)
         @semaphore.synchronize do
           @cached_calendars ||= {}
-          unless @cached_calendars.include?(calendar)
-            @cached_calendars[calendar] = load(calendar)
-          end
+          @cached_calendars[calendar] = load(calendar) unless @cached_calendars.include?(calendar)
           @cached_calendars[calendar]
         end
       end
@@ -58,9 +63,9 @@ module BankingCalendar
     end
 
     def validate_config
-      unless (@config.keys - VALID_CALENDAR_KEYS).empty?
-        raise "Only the following keys are valid: #{VALID_CALENDAR_KEYS.join(', ')}"
-      end
+      return if (@config.keys - VALID_CALENDAR_KEYS).empty?
+
+      raise "Only the following keys are valid: #{VALID_CALENDAR_KEYS.join(', ')}"
     end
 
     def next_banking_day(date)
@@ -177,24 +182,20 @@ module BankingCalendar
     end
 
     def time_or_datetime?(date)
-      unless date.is_a?(Time) || date.is_a?(DateTime)
-        raise "#{date} is #{date.class}. " \
-          'Must be Time or DateTime if accounting for banking hours.'
-      end
+      return if date.is_a?(Time) || date.is_a?(DateTime)
+
+      raise "#{date} is #{date.class}. " \
+        'Must be Time or DateTime if accounting for banking hours.'
     end
 
     def roll_forward(date)
-      if banking_day?(date) && after_banking_hours?(date)
-        date = next_banking_day(date)
-      end
+      date = next_banking_day(date) if banking_day?(date) && after_banking_hours?(date)
 
       date
     end
 
     def roll_backward(date)
-      if banking_day?(date) && before_banking_hours?(date)
-        date = previous_banking_day(date)
-      end
+      date = previous_banking_day(date) if banking_day?(date) && before_banking_hours?(date)
 
       date
     end
@@ -207,9 +208,7 @@ module BankingCalendar
       elsif rollover == :before
         date = roll_backward(date)
       end
-      date = end_of_banking_day(date)
-
-      date
+      end_of_banking_day(date)
     end
 
     def banking_hours
