@@ -65,7 +65,7 @@ module BankingCalendar
       validate_config
     end
 
-    def default
+    def default_configuration
       @options = {}
     end
 
