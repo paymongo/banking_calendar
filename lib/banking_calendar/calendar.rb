@@ -231,9 +231,7 @@ module BankingCalendar
     end
 
     def banking_days
-      @banking_days ||= (
-        @options[:custom_banking_days] || @config[:banking_days] || DEFAULT_BANKING_DAYS
-      ).map do |day|
+      (@options[:custom_banking_days] || @config[:banking_days] || DEFAULT_BANKING_DAYS).map do |day|
         day.downcase.strip[0..2].tap do |shortened_day|
           raise "#{day} is an invalid day." unless VALID_DAYS.include?(shortened_day)
         end
