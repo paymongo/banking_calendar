@@ -65,6 +65,10 @@ module BankingCalendar
       validate_config
     end
 
+    def default
+      @options = {}
+    end
+
     def include_weekends
       @options[:custom_banking_days] = VALID_DAYS
     end
