@@ -59,7 +59,18 @@ module BankingCalendar
 
     def initialize(config)
       @config = config
+
+      @options = {}
+
       validate_config
+    end
+
+    def default_configuration
+      @options = {}
+    end
+
+    def include_weekends
+      @options[:custom_banking_days] = VALID_DAYS
     end
 
     def validate_config
@@ -224,7 +235,7 @@ module BankingCalendar
     end
 
     def banking_days
-      @banking_days ||= (@config[:banking_days] || DEFAULT_BANKING_DAYS).map do |day|
+      (@options[:custom_banking_days] || @config[:banking_days] || DEFAULT_BANKING_DAYS).map do |day|
         day.downcase.strip[0..2].tap do |shortened_day|
           raise "#{day} is an invalid day." unless VALID_DAYS.include?(shortened_day)
         end
